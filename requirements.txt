@@ -1,1 +1,11 @@
+# Telegram-бот
 pyTelegramBotAPI>=4.14.0
+
+# HTTP-запросы (OpenRouter AI в боте)
+requests>=2.31.0
+
+# Django-сайт
+django>=4.2.0
+
+# Pygame-версия
+pygame>=2.5.0
