@@ -87,8 +87,11 @@ def ask_gemini(question: str) -> str:
     if not AI_TOKEN:
         return "⚠️ OpenRouter не настроен (отсутствует API-ключ)."
     try:
+
         profile_1 = json.dumps(data, ensure_ascii=False, indent=2)
         profile_2 = json.dumps(data2, ensure_ascii=False, indent=2)
+        profile_1 = json.dumps(data, ensure_ascii=False, indent=2) if data else "{}"
+        profile_2 = json.dumps(data2, ensure_ascii=False, indent=2) if data2 else "{}"
 
         system_prompt = (
             "Ты — полезный ИИ-ассистент, встроенный в бот-портфолио.\n"
