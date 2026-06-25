@@ -16,10 +16,18 @@ ai_token_arg = positional[1] if len(positional) > 1 else None
 
 import os
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-with open(os.path.join(_ROOT, "data.json"), "r", encoding="utf-8") as f:
-    data = json.load(f)
-with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "data2.json"), "r", encoding="utf-8") as f:
-    data2 = json.load(f)
+_DATA_PATH = os.path.join(_ROOT, "data.json")
+if os.path.exists(_DATA_PATH):
+    with open(_DATA_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+else:
+    data = {}
+_DATA2_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data2.json")
+if os.path.exists(_DATA2_PATH):
+    with open(_DATA2_PATH, "r", encoding="utf-8") as f:
+        data2 = json.load(f)
+else:
+    data2 = {}
 TOKEN        = token_arg        or data.get("token")
 AI_TOKEN = ai_token_arg or data.get("openrouter_token")
 
@@ -113,6 +121,10 @@ def ask_gemini(question: str) -> str:
         result = resp.json()
         return result["choices"][0]["message"]["content"]
 
+    except requests.exceptions.Timeout:
+        return "⏳ ИИ не ответил вовремя. Попробуй ещё раз."
+    except requests.exceptions.HTTPError as http_err:
+        return f"❌ Ошибка API: {http_err}"
     except Exception as e:
         if DEBUG:
             print(f"[openrouter] Внутренняя ошибка: {e}")
