@@ -1,0 +1,7 @@
+echo "*/data.json" > .gitignore
+echo "*/data2.json" >> .gitignoreсв
+echo "__pycache__/" >> .gitignore
+echo "*.pyc" >> .gitignore
+echo ".venv/" >> .gitignore
+echo "*/db.sqlite3" >> .gitignore
+echo "*/__pycache__/" >> .gitignore

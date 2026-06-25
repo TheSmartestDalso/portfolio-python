@@ -1,0 +1,160 @@
+{% extends 'portfolio/base.html' %}
+{% block content %}
+
+<style>
+    .back { color: #787890; text-decoration: none; font-size: 13px; }
+    .back:hover { color: #64a0ff; }
+
+    h2 { font-size: 28px; color: white; margin: 16px 0 32px; }
+
+    .label {
+        font-size: 12px;
+        color: #64a0ff;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .label.purple { color: #b482ff; }
+
+    p { color: #dcdce6; line-height: 1.7; margin-bottom: 20px; font-size: 15px; }
+
+    ul { list-style: none; }
+    ul li { padding: 6px 0; color: #dcdce6; font-size: 15px; line-height: 1.6; }
+    ul li::before { content: "— "; color: #64a0ff; }
+
+    .timeline li { padding: 10px 0 10px 20px; border-left: 2px solid #2a2a3a; margin-left: 8px; }
+    .timeline li::before { content: ""; }
+    .timeline li::marker { display: none; }
+
+    .mentor-card {
+        background: #161620;
+        border: 1px solid #2a2a3a;
+        border-radius: 10px;
+        padding: 20px 24px;
+        margin-bottom: 28px;
+        font-size: 15px;
+        color: white;
+    }
+
+    .mentor-card span { color: #787890; font-size: 13px; display: block; margin-top: 4px; }
+
+    .progress-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    .progress-col h4 { font-size: 12px; letter-spacing: 1px; margin-bottom: 12px; }
+    .progress-col.a h4 { color: #787890; }
+    .progress-col.b h4 { color: #64a0ff; }
+    .progress-col ul li::before { content: "✗ "; }
+    .progress-col.b ul li::before { content: "✓ "; color: #64a0ff; }
+
+    .works-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .work-card {
+        background: #161620;
+        border: 1px solid #2a2a3a;
+        border-radius: 10px;
+        padding: 20px 24px;
+    }
+
+    .work-card h3 { color: white; font-size: 16px; margin-bottom: 6px; }
+    .work-card p { color: #787890; margin-bottom: 10px; font-size: 14px; }
+    .work-card a { color: #64a0ff; font-size: 13px; }
+
+    .github-card {
+        background: #161620;
+        border: 1px solid #2a2a3a;
+        border-radius: 10px;
+        padding: 32px;
+        text-align: center;
+    }
+
+    .github-card h3 { color: white; font-size: 20px; margin-bottom: 10px; }
+    .github-card a { color: #64a0ff; font-size: 15px; }
+    .github-card p { color: #787890; font-size: 13px; margin-top: 8px; }
+</style>
+
+<a class="back" href="/">← Назад</a>
+<h2>{{ title }}</h2>
+
+{% if slug == 'about' %}
+    <p style="font-size:22px; color:white; font-weight:600;">{{ data.about.name }}</p>
+    <p style="color:#787890;">{{ data.about.role }} · {{ data.about.age }} лет</p>
+    <div class="label" style="margin-top:24px;">ФАКТЫ</div>
+    <ul>
+        {% for fact in data.about.facts %}
+        <li>{{ fact }}</li>
+        {% endfor %}
+    </ul>
+
+{% elif slug == 'goal' %}
+    <div class="label">ЦЕЛЬ</div>
+    <p>{{ data.goal.short }}</p>
+    <div class="label purple">ДОЛГОСРОЧНО</div>
+    <p>{{ data.goal.long }}</p>
+
+{% elif slug == 'journey' %}
+    <ul class="timeline">
+        {% for step in data.journey %}
+        <li>{{ step }}</li>
+        {% endfor %}
+    </ul>
+
+{% elif slug == 'mentor' %}
+    <div class="mentor-card">
+        {{ data.mentor.name }}
+        <span>Ментор · CapEducation</span>
+    </div>
+    <div class="label">ЧЕМ ПОМОГ</div>
+    <ul>
+        {% for item in data.mentor.contributions %}
+        <li>{{ item }}</li>
+        {% endfor %}
+    </ul>
+
+{% elif slug == 'progress' %}
+    <div class="progress-grid">
+        <div class="progress-col a">
+            <h4>БЫЛО</h4>
+            <ul>
+                {% for item in data.progress.point_a %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="progress-col b">
+            <h4>СТАЛО</h4>
+            <ul>
+                {% for item in data.progress.point_b %}
+                <li>{{ item }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+{% elif slug == 'hobbies' %}
+    <ul>
+        {% for hobby in data.hobbies %}
+        <li>{{ hobby }}</li>
+        {% endfor %}
+    </ul>
+
+{% elif slug == 'works' %}
+    <div class="works-list">
+        {% for work in data.works %}
+        <div class="work-card">
+            <h3>{{ forloop.counter }}. {{ work.title }}</h3>
+            <p>{{ work.description }}</p>
+            <a href="{{ work.link }}" target="_blank">Открыть →</a>
+        </div>
+        {% endfor %}
+    </div>
+
+{% elif slug == 'github' %}
+    <div class="github-card">
+        <h3>TheSmartestDalso</h3>
+        <a href="{{ data.github }}" target="_blank">{{ data.github }}</a>
+        <p>Репо: portfolio-python</p>
+    </div>
+
+{% endif %}
+
+{% endblock %}
