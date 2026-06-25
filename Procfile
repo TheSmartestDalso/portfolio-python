@@ -1,0 +1,1 @@
+worker: python portfolio_Telebot/Bot.py
