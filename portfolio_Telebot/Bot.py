@@ -5,14 +5,13 @@ import telebot
 from telebot import types
 import requests
 import threading
-
+import os
 
 DEBUG = "--debug" in sys.argv
 
 positional = [a for a in sys.argv[1:] if not a.startswith("--")]
 token_arg        = positional[0] if len(positional) > 0 else None
 ai_token_arg = positional[1] if len(positional) > 1 else None
-
 
 import os
 _ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,28 +21,30 @@ if os.path.exists(_DATA_PATH):
         data = json.load(f)
 else:
     data = {}
+
 _DATA2_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data2.json")
 if os.path.exists(_DATA2_PATH):
     with open(_DATA2_PATH, "r", encoding="utf-8") as f:
         data2 = json.load(f)
 else:
     data2 = {}
-TOKEN        = token_arg        or data.get("token")
-AI_TOKEN = ai_token_arg or data.get("openrouter_token")
+
+# Приоритет: 1. Переменные окружения (Railway) -> 2. Аргументы консоли -> 3. Локальный JSON
+TOKEN    = os.getenv("BOT_TOKEN")        or token_arg    or data.get("BOT_TOKEN")
+AI_TOKEN = os.getenv("OPENROUTER_TOKEN") or ai_token_arg or data.get("OPENROUTER_TOKEN")
 
 if not TOKEN:
-    print(" Токен Telegram не найден")
+    print("❌ Токен Telegram не найден. Проверьте переменные окружения BOT_TOKEN в Railway.")
     sys.exit(1)
 
 if not AI_TOKEN:
-    print("OpenRouter-токен не найден")
+    print("⚠️ OpenRouter-токен не найден (переменная OPENROUTER_TOKEN). Функции ИИ будут недоступны.")
 
 if DEBUG:
     print(f"[DEBUG] TG токен: {TOKEN[:10]}...")
     print(f"[DEBUG] OpenRouter токен: {'задан' if AI_TOKEN else 'не задан'}")
 
 bot = telebot.TeleBot(TOKEN)
-
 
 RE_ABOUT    = re.compile(r"о\s*себе",         re.IGNORECASE)
 RE_GOAL     = re.compile(r"моя?\s*цель",      re.IGNORECASE)
@@ -54,7 +55,6 @@ RE_HOBBIES  = re.compile(r"хобби",            re.IGNORECASE)
 RE_WORKS    = re.compile(r"работы",           re.IGNORECASE)
 RE_GITHUB   = re.compile(r"github",           re.IGNORECASE)
 RE_AI       = re.compile(r"^(спроси|вопрос|ии|ai)\s*[:,]?\s*(.+)", re.IGNORECASE)
-
 
 
 def main_menu():
@@ -109,7 +109,8 @@ def ask_gemini(question: str) -> str:
             "Content-Type": "application/json",
         }
         body = {
-            "model": "cohere/north-mini-code:free",            "messages": [
+            "model": "cohere/north-mini-code:free",
+            "messages": [
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": question}
             ]
@@ -207,7 +208,6 @@ def menu(message):
             print(f"[menu] ошибка: {e}")
 
 
-
 @bot.message_handler(commands=["about"])
 @bot.message_handler(func=lambda m: bool(RE_ABOUT.search(m.text or "")))
 def about(message):
@@ -265,7 +265,6 @@ def github(message):
         if DEBUG: print(f"[github] {e}")
 
 
-
 @bot.message_handler(func=lambda m: m.text == "🤖 Задать вопрос ИИ")
 def ai_prompt(message):
     try:
@@ -315,7 +314,6 @@ def ai_text(message):
         if DEBUG: print(f"[ai_text] {e}")
 
 
-
 CALLBACKS = {
     "about":    send_about,
     "goal":     send_goal,
@@ -344,7 +342,6 @@ def callback_handler(call):
         if DEBUG: print(f"[callback] {e}")
 
 
-
 @bot.message_handler(func=lambda m: True)
 def unknown(message):
     try:
@@ -357,7 +354,6 @@ def unknown(message):
         )
     except Exception as e:
         if DEBUG: print(f"[unknown] {e}")
-
 
 
 if __name__ == "__main__":
